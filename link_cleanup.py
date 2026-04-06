@@ -1,4 +1,4 @@
-import re
+import sys
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit, parse_qs, urlencode
 
@@ -37,3 +37,7 @@ def clean_up_link(url: str) -> str:
         Pattern(['open.spotify.com'], queries_to_remove=['si', 'context', 'pi'])
     )
     return cleaner.clean(url)
+
+
+if __name__ == '__main__':
+    print(clean_up_link(sys.argv[1]))
