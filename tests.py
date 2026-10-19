@@ -62,19 +62,31 @@ def test_remove_query_based_on_url():
     assert cleaner.clean('https://bar.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://bar.com/my/path?aaa=aaa&ccc=ccc'
 
 
-def test_real_usage():
-    assert clean_up_link(
-        'https://open.spotify.com/track/7rK68oMQ3KYzsFRPaIdb3i?si=rYfLzNHzQCmgggzfBg') == 'https://open.spotify.com/track/7rK68oMQ3KYzsFRPaIdb3i'
-    assert clean_up_link(
-        'https://open.spotify.com/track/4pYuPkr13zQbrrDChQrfQs?si=dotOgggaTE-OhDyeeiyAOA&context=spotify%3Aplaylist%3A37i9dQZF1gggevO1aAyaE') == 'https://open.spotify.com/track/4pYuPkr13zQbrrDChQrfQs'
-    assert clean_up_link(
-        'https://open.spotify.com/playlist/37i9dQZF1DZ06evO1aAyaE?si=8oBzjYVSRBORA6gggLeDw&pi=VwcIYn_gggKUv') == 'https://open.spotify.com/playlist/37i9dQZF1DZ06evO1aAyaE'
-    assert clean_up_link(
-        'https://open.spotify.com/artist/244uLu9lkdw39BJwlul3k8?si=pf4uwzUzggg2Kv-oOFLe5hA') == 'https://open.spotify.com/artist/244uLu9lkdw39BJwlul3k8'
-    assert clean_up_link(
-        'https://open.spotify.com/album/3ZXd4o2kk2UjDcfpQnZjMN?si=dDoQggg4QqOyc-_F7LBvtA') == 'https://open.spotify.com/album/3ZXd4o2kk2UjDcfpQnZjMN'
-    assert clean_up_link('https://youtu.be/LMhResdylaE?t=64&is=o1MwcvgggSz8fsFY') == 'https://youtu.be/LMhResdylaE?t=64'
-    assert clean_up_link(
-        'https://x.com/kmcnam1/status/2040858635086209325?s=20') == 'https://fixupx.com/kmcnam1/status/2040858635086209325'
-    assert clean_up_link(
-        'https://www.youtube.com/watch?v=LMhResdylaE&list=WL&index=1&t=5361s') == 'https://www.youtube.com/watch?v=LMhResdylaE&t=5361s'
+test_cases = [
+    ('spotify_track_1', 'https://open.spotify.com/track/7rK68oMQ3KYzsFRPaIdb3i?si=rYfLzNHzQCmgggzfBg',
+     'https://open.spotify.com/track/7rK68oMQ3KYzsFRPaIdb3i'),
+    ('spotify_track_2',
+     'https://open.spotify.com/track/4pYuPkr13zQbrrDChQrfQs?si=dotOgggaTE-OhDyeeiyAOA&context=spotify%3Aplaylist%3A37i9dQZF1gggevO1aAyaE',
+     'https://open.spotify.com/track/4pYuPkr13zQbrrDChQrfQs'),
+    ('spotify_playlist',
+     'https://open.spotify.com/playlist/37i9dQZF1DZ06evO1aAyaE?si=8oBzjYVSRBORA6gggLeDw&pi=VwcIYn_gggKUv',
+     'https://open.spotify.com/playlist/37i9dQZF1DZ06evO1aAyaE'),
+    ('spotify_artist', 'https://open.spotify.com/artist/244uLu9lkdw39BJwlul3k8?si=pf4uwzUzggg2Kv-oOFLe5hA',
+     'https://open.spotify.com/artist/244uLu9lkdw39BJwlul3k8'),
+    ('spotify_album', 'https://open.spotify.com/album/3ZXd4o2kk2UjDcfpQnZjMN?si=dDoQggg4QqOyc-_F7LBvtA',
+     'https://open.spotify.com/album/3ZXd4o2kk2UjDcfpQnZjMN'),
+    ('youtube_video_1', 'https://youtu.be/LMhResdylaE?t=64&is=o1MwcvgggSz8fsFY',
+     'https://youtu.be/LMhResdylaE?t=64'),
+    ('youtube_video_2', 'https://www.youtube.com/watch?v=LMhResdylaE&list=WL&index=1&t=5361s',
+     'https://www.youtube.com/watch?v=LMhResdylaE&t=5361s'),
+    ('x_post', 'https://x.com/kmcnam1/status/2040858635086209325?s=20',
+     'https://fixupx.com/kmcnam1/status/2040858635086209325'),
+]
+
+
+@pytest.mark.parametrize(
+    ['tc_name', 'original', 'clean'], test_cases,
+    ids=[name for (name, _, _) in test_cases]
+)
+def test_real_usage(tc_name, original, clean):
+    assert clean_up_link(original) == clean
