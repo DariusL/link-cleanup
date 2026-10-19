@@ -34,7 +34,7 @@ def clean_up_link(url: str) -> str:
     cleaner = Cleaner(
         Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com', queries_to_remove=['s', 'si']),
         Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], queries_to_remove=['list', 'is', 'index']),
-        Pattern(['open.spotify.com'], queries_to_remove=['si', 'context', 'pi'])
+        Pattern(['open.spotify.com'], queries_to_remove=['si', 'context', 'pi', 'utm_source'])
     )
     return cleaner.clean(url)
 
