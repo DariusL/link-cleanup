@@ -54,12 +54,37 @@ def test_remove_two_queries():
         'https://foo.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/my/path?bbb=bbb'
 
 
-def test_remove_query_based_on_url():
+def test_match_first_pattern():
     cleaner = Cleaner(
+        Pattern(['bar.com'], queries_to_remove=['bbb']),
         Pattern(['foo.com'], queries_to_remove=['aaa']),
-        Pattern(['bar.com'], queries_to_remove=['bbb'])
     )
     assert cleaner.clean('https://bar.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://bar.com/my/path?aaa=aaa&ccc=ccc'
+
+
+def test_match_last_pattern():
+    cleaner = Cleaner(
+        Pattern(['foo.com'], queries_to_remove=['aaa']),
+        Pattern(['bar.com'], queries_to_remove=['bbb']),
+    )
+    assert cleaner.clean('https://bar.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://bar.com/my/path?aaa=aaa&ccc=ccc'
+
+
+def test_match_path():
+    cleaner = Cleaner(
+        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_remove=['aaa']),
+        Pattern(['foo.com'], queries_to_remove=['bbb']),
+    )
+    assert cleaner.clean('https://foo.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/my/path?bbb=bbb&ccc=ccc'
+
+
+def test_ignore_pattern_unmatched_path():
+    cleaner = Cleaner(
+        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_remove=['aaa']),
+        Pattern(['foo.com'], queries_to_remove=['bbb']),
+    )
+    assert cleaner.clean(
+        'https://foo.com/other/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/other/path?aaa=aaa&ccc=ccc'
 
 
 test_cases = [
@@ -80,6 +105,8 @@ test_cases = [
      'https://youtu.be/LMhResdylaE?t=64'),
     ('youtube_video_2', 'https://www.youtube.com/watch?v=LMhResdylaE&list=WL&index=1&t=5361s',
      'https://www.youtube.com/watch?v=LMhResdylaE&t=5361s'),
+    ('youtube_playlist_1', 'https://youtube.com/playlist?list=PL9e7gmwejeGr7aqh9A4h4A0xgkveb8ld&si=TcNfjSHyIX__E4d',
+     'https://youtube.com/playlist?list=PL9e7gmwejeGr7aqh9A4h4A0xgkveb8ld'),
     ('x_post', 'https://x.com/kmcnam1/status/2040858635086209325?s=20',
      'https://fixupx.com/kmcnam1/status/2040858635086209325'),
 ]
