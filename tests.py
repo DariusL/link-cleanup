@@ -1,6 +1,6 @@
 import pytest
 
-from link_cleanup import Pattern, Cleaner, clean_up_link
+from link_cleanup import Pattern, Cleaner, clean_up_link, InputError
 
 
 def test_unmatched_url_is_not_affected():
@@ -117,4 +117,20 @@ test_cases = [
     ids=[name for (name, _, _) in test_cases]
 )
 def test_real_usage(tc_name, original, clean):
-    assert clean_up_link(original) == clean
+    assert clean_up_link(original) == {'status': 'success', 'url': clean}
+
+
+@pytest.mark.parametrize(
+    ['original'], [('',), (' ',), (None,)]
+)
+def test_empty_input(original):
+    with pytest.raises(InputError, match='Missing input url'):
+        Cleaner().clean(' ')
+
+def test_invalid_input():
+    with pytest.raises(InputError, match='Invalid input url "foo"'):
+        Cleaner().clean('foo')
+
+
+def test_clean_failure():
+    assert clean_up_link(' ') == {'status': 'failure', 'message': 'Missing input url'}
