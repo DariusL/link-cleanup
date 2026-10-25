@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from link_cleanup import Pattern, Cleaner, clean_up_link, InputError
@@ -117,7 +119,7 @@ test_cases = [
     ids=[name for (name, _, _) in test_cases]
 )
 def test_real_usage(tc_name, original, clean):
-    assert clean_up_link(original) == {'status': 'success', 'url': clean}
+    assert clean_up_link(original) == json.dumps({'status': 'success', 'url': clean})
 
 
 @pytest.mark.parametrize(
@@ -133,4 +135,4 @@ def test_invalid_input():
 
 
 def test_clean_failure():
-    assert clean_up_link(' ') == {'status': 'failure', 'message': 'Missing input url'}
+    assert clean_up_link(' ') == json.dumps({'status': 'failure', 'message': 'Missing input url'})

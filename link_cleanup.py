@@ -1,3 +1,4 @@
+import json
 import sys
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit, parse_qs, urlencode
@@ -46,7 +47,7 @@ class Cleaner:
         return url
 
 
-def clean_up_link(url: str) -> dict[str, str]:
+def clean_up_link(url: str) -> str:
     cleaner = Cleaner(
         Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com', queries_to_remove=['s', 'si']),
         Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], target_paths=['/playlist'],
@@ -56,11 +57,11 @@ def clean_up_link(url: str) -> dict[str, str]:
     )
     # noinspection PyBroadException
     try:
-        return {'status': 'success', 'url': cleaner.clean(url)}
+        return json.dumps({'status': 'success', 'url': cleaner.clean(url)})
     except InputError as e:
-        return {'status': 'failure', 'message': e.message}
+        return json.dumps({'status': 'failure', 'message': e.message})
     except Exception as e:
-        return {'status': 'failure', 'message': str(e)}
+        return json.dumps({'status': 'failure', 'message': str(e)})
 
 
 if __name__ == '__main__':
