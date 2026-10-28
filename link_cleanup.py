@@ -49,7 +49,7 @@ class Cleaner:
 
 def clean_up_link(url: str) -> str:
     cleaner = Cleaner(
-        Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com', queries_to_remove=['s', 'si']),
+        Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com', queries_to_remove=['s', 'si', 'a']),
         Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], target_paths=['/playlist'],
                 queries_to_remove=['is', 'index', 'si']),
         Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], queries_to_remove=['list', 'is', 'index', 'si']),

@@ -109,8 +109,8 @@ test_cases = [
      'https://www.youtube.com/watch?v=LMhResdylaE&t=5361s'),
     ('youtube_playlist_1', 'https://youtube.com/playlist?list=PL9e7gmwejeGr7aqh9A4h4A0xgkveb8ld&si=TcNfjSHyIX__E4d',
      'https://youtube.com/playlist?list=PL9e7gmwejeGr7aqh9A4h4A0xgkveb8ld'),
-    ('x_post', 'https://x.com/kmcnam1/status/2040858635086209325?s=20',
-     'https://fixupx.com/kmcnam1/status/2040858635086209325'),
+    ('x_post', 'https://x.com/SnarkingIsLegal/status/2115489150069616883?a=Ap1Qd-VcM4mGcrcuE&s=20',
+     'https://fixupx.com/SnarkingIsLegal/status/2115489150069616883'),
 ]
 
 
