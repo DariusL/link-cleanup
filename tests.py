@@ -30,60 +30,60 @@ def test_replace_url_with_path():
 
 
 def test_remove_single_query():
-    pattern = Pattern(['foo.com'], queries_to_remove=['si'])
+    pattern = Pattern(['foo.com'])
     assert Cleaner(pattern).clean('https://foo.com/my/path?si=aaa') == 'https://foo.com/my/path'
 
 
 def test_remove_first_query():
-    pattern = Pattern(['foo.com'], queries_to_remove=['si'])
+    pattern = Pattern(['foo.com'], queries_to_keep=['foo'])
     assert Cleaner(pattern).clean('https://foo.com/my/path?si=aaa&foo=bar') == 'https://foo.com/my/path?foo=bar'
 
 
 def test_remove_last_query():
-    pattern = Pattern(['foo.com'], queries_to_remove=['foo'])
+    pattern = Pattern(['foo.com'], queries_to_keep=['si'])
     assert Cleaner(pattern).clean('https://foo.com/my/path?si=aaa&foo=bar') == 'https://foo.com/my/path?si=aaa'
 
 
 def test_remove_middle_query():
-    pattern = Pattern(['foo.com'], queries_to_remove=['bbb'])
+    pattern = Pattern(['foo.com'], queries_to_keep=['aaa', 'ccc'])
     assert Cleaner(pattern).clean(
         'https://foo.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/my/path?aaa=aaa&ccc=ccc'
 
 
 def test_remove_two_queries():
-    pattern = Pattern(['foo.com'], queries_to_remove=['aaa', 'ccc'])
+    pattern = Pattern(['foo.com'], queries_to_keep=['bbb'])
     assert Cleaner(pattern).clean(
         'https://foo.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/my/path?bbb=bbb'
 
 
 def test_match_first_pattern():
     cleaner = Cleaner(
-        Pattern(['bar.com'], queries_to_remove=['bbb']),
-        Pattern(['foo.com'], queries_to_remove=['aaa']),
+        Pattern(['bar.com'], queries_to_keep=['aaa', 'ccc']),
+        Pattern(['foo.com'], queries_to_keep=['aaa', 'bbb']),
     )
     assert cleaner.clean('https://bar.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://bar.com/my/path?aaa=aaa&ccc=ccc'
 
 
 def test_match_last_pattern():
     cleaner = Cleaner(
-        Pattern(['foo.com'], queries_to_remove=['aaa']),
-        Pattern(['bar.com'], queries_to_remove=['bbb']),
+        Pattern(['foo.com'], queries_to_keep=['bbb']),
+        Pattern(['bar.com'], queries_to_keep=['aaa', 'ccc']),
     )
     assert cleaner.clean('https://bar.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://bar.com/my/path?aaa=aaa&ccc=ccc'
 
 
 def test_match_path():
     cleaner = Cleaner(
-        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_remove=['aaa']),
-        Pattern(['foo.com'], queries_to_remove=['bbb']),
+        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_keep=['bbb', 'ccc']),
+        Pattern(['foo.com'], queries_to_keep=['aaa', 'bbb']),
     )
     assert cleaner.clean('https://foo.com/my/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/my/path?bbb=bbb&ccc=ccc'
 
 
 def test_ignore_pattern_unmatched_path():
     cleaner = Cleaner(
-        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_remove=['aaa']),
-        Pattern(['foo.com'], queries_to_remove=['bbb']),
+        Pattern(['foo.com'], target_paths=['/my/path'], queries_to_keep=['aaa']),
+        Pattern(['foo.com'], queries_to_keep=['aaa', 'ccc']),
     )
     assert cleaner.clean(
         'https://foo.com/other/path?aaa=aaa&bbb=bbb&ccc=ccc') == 'https://foo.com/other/path?aaa=aaa&ccc=ccc'

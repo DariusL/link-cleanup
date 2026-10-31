@@ -1,5 +1,6 @@
 import json
 import sys
+from copy import deepcopy
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit, parse_qs, urlencode
 
@@ -9,7 +10,7 @@ class Pattern:
     target_hosts: list[str]
     target_paths: list[str] | None = None
     replacement_host: str | None = None
-    queries_to_remove: list[str] = field(default_factory=list)
+    queries_to_keep: list[str] = field(default_factory=list)
 
 
 class InputError(Exception):
@@ -40,20 +41,18 @@ class Cleaner:
                     continue
                 if pattern.replacement_host:
                     netloc = pattern.replacement_host
-                for query_to_remove in pattern.queries_to_remove:
-                    if query_to_remove in query_parameters:
-                        del query_parameters[query_to_remove]
+                query_parameters = {k: v for k, v in query_parameters.items() if k in pattern.queries_to_keep}
                 return components._replace(netloc=netloc, query=urlencode(query_parameters, doseq=True)).geturl()
         return url
 
 
 def clean_up_link(url: str) -> str:
     cleaner = Cleaner(
-        Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com', queries_to_remove=['s', 'si', 'a']),
+        Pattern(['x.com', 'twitter.com'], replacement_host='fixupx.com'),
         Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], target_paths=['/playlist'],
-                queries_to_remove=['is', 'index', 'si']),
-        Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], queries_to_remove=['list', 'is', 'index', 'si']),
-        Pattern(['open.spotify.com'], queries_to_remove=['si', 'context', 'pi', 'utm_source'])
+                queries_to_keep=['list']),
+        Pattern(['youtu.be', 'youtube.com', 'www.youtube.com'], queries_to_keep=['v', 't']),
+        Pattern(['open.spotify.com'])
     )
     # noinspection PyBroadException
     try:
